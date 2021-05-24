@@ -1,7 +1,9 @@
 package pl.kwl.jasper;
 
+import net.sf.jasperreports.engine.DefaultJasperReportsContext;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExpression;
+import net.sf.jasperreports.engine.JRExpressionCollector;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
@@ -11,7 +13,7 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.List;
 
 public class JasperMain {
 
@@ -26,8 +28,10 @@ public class JasperMain {
         JasperDesign jasperDesign = JRXmlLoader.load(stream);
         JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
 
-        int size = jasperDesign.getExpressions().size();
-        JRExpression expression = ((ArrayList<JRExpression>)jasperDesign.getExpressions()).get(size - 1);
+        DefaultJasperReportsContext jasperReportsContext = DefaultJasperReportsContext.getInstance();
+		List<JRExpression> compiledExpression = JRExpressionCollector.collectExpressions(jasperReportsContext, jasperReport);
+        int size = compiledExpression.size();
+        JRExpression expression = compiledExpression.get(size - 1);
 
         JREvaluator evaluator = JasperCompileManager.loadEvaluator(jasperReport);
         Object jasperEvaluatedValue = evaluator.evaluate(expression);
